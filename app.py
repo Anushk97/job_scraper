@@ -12,6 +12,7 @@ from tika import parser
 from werkzeug.utils import secure_filename
 # import PyPDF2
 from datetime import datetime
+import textract
 
 openai_key = st.sidebar.text_input("Enter your [OpenAI](https://openai.com/index/openai-api/) API key to prompt (optional):")
 
@@ -90,8 +91,10 @@ class Resume:
 #             os.makedirs(UPLOAD_FOLDER)
             
     def extract_pdf_data(self, filename):
-        parsed_pdf = parser.from_file(filename)
-        return parsed_pdf['content'], parsed_pdf['metadata']
+        # parsed_pdf = parser.from_file(filename)
+        # return parsed_pdf['content'], parsed_pdf['metadata']
+        text = textract.process(filename)
+        return text
 
     def generateResumeSummarizationPrompt(self, text):
         return f"Please summarize the following resume:\n\n{text}"
@@ -140,7 +143,6 @@ class Resume:
         uploaded_file = file_name
         # st.write(upload_file)
         
-        
         if uploaded_file is not None:
             
             st.success('Resume uploaded!')
@@ -151,52 +153,54 @@ class Resume:
             with open(filepath, "wb") as f:
                 f.write(uploaded_file.getbuffer())
 
-            # Parse resume PDF and create background summary
-            text, _ = self.extract_pdf_data(filepath)
-            text = text.strip()
+            if os.path.exists(filepath):
+                # Parse resume PDF and create background summary
+                # text, _ = self.extract_pdf_data(filepath)
+                text = self.extract_pdf_data(filepath)
+                text = text.strip()
 
-            prompt = self.generateResumeSummarizationPrompt(text)
-            ans_from_gpt = self.get_ans(prompt)
-            st.write(ans_from_gpt)
-            st.markdown("""---""")
+                prompt = self.generateResumeSummarizationPrompt(text)
+                ans_from_gpt = self.get_ans(prompt)
+                st.write(ans_from_gpt)
+                st.markdown("""---""")
+                
             
-        
-            
-            # company_name = 'Google'
-            # role_desc = 'ML Engineer'
-            # job_pos = 'ML Engineer'
-            
-            
-            # type_app = 'cover-letter'
-            
-            user_background = ans_from_gpt
-            # st.write('user background', user_background)
-            company_name = company_name
-            role_description = role_desc
-            job_position = job_pos
-            
-            # if st.sidebar.button('search', type='primary'):
-                # st.header(f'generated {type_app}')
-            st.success(f'generated {type_app}')
-            if type_app == 'cover-letter':
-                prompt = self.generateCoverLetterPrompt(company_name, user_background, role_description, job_position)
-            elif type_app == 'why-us':
-                prompt = self.generateWhyUsPrompt(company_name, user_background, role_description, job_position)
-            else:
-                raise ValueError("Unknown question type.")
+                
+                # company_name = 'Google'
+                # role_desc = 'ML Engineer'
+                # job_pos = 'ML Engineer'
+                
+                
+                # type_app = 'cover-letter'
+                
+                user_background = ans_from_gpt
+                # st.write('user background', user_background)
+                company_name = company_name
+                role_description = role_desc
+                job_position = job_pos
+                
+                # if st.sidebar.button('search', type='primary'):
+                    # st.header(f'generated {type_app}')
+                st.success(f'generated {type_app}')
+                if type_app == 'cover-letter':
+                    prompt = self.generateCoverLetterPrompt(company_name, user_background, role_description, job_position)
+                elif type_app == 'why-us':
+                    prompt = self.generateWhyUsPrompt(company_name, user_background, role_description, job_position)
+                else:
+                    raise ValueError("Unknown question type.")
 
-            response = openai.ChatCompletion.create(
-                # messages=[{'role': 'user', 'content': 'Say this is test.'}],  # XXX debugging purpose
-                messages=[
-                    {"role": "system", "content": "You are a helpful job application assistant."},
-                    {'role': 'user', 'content': prompt}
-                ],
-                model="gpt-3.5-turbo",
-                temperature=0.2,
-                max_tokens=1000
-            )
-            resp = response['choices'][0]['message']['content'].strip()
-            st.write(resp)
+                response = openai.ChatCompletion.create(
+                    # messages=[{'role': 'user', 'content': 'Say this is test.'}],  # XXX debugging purpose
+                    messages=[
+                        {"role": "system", "content": "You are a helpful job application assistant."},
+                        {'role': 'user', 'content': prompt}
+                    ],
+                    model="gpt-3.5-turbo",
+                    temperature=0.2,
+                    max_tokens=1000
+                )
+                resp = response['choices'][0]['message']['content'].strip()
+                st.write(resp)
 
         # upload_file(openai_key)
         # st.write(upload)
