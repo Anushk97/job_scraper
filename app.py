@@ -6,6 +6,8 @@ import pandas_gpt
 import os
 from IPython.display import HTML
 from tika import parser
+tika.initVM()
+from tika import parser
 from werkzeug.utils import secure_filename
 # import PyPDF2
 from datetime import datetime
