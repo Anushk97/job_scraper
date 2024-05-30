@@ -1,7 +1,7 @@
 streamlit
 openai
 python-jobspy
-# tika == 2.6.0
+tika
 werkzeug
 pandas_gpt
 ipython
