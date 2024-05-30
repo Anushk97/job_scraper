@@ -1,7 +1,8 @@
-streamlit
-openai
+streamlit == 1.35.0
+openai == 0.27.0
 python-jobspy
-tika
-werkzeug
-pandas_gpt
-ipython
+tika == 2.6.0
+werkzeug == 2.2.3
+pandas_gpt == 0.6.0
+ipython == 8.24.0
+
