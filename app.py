@@ -5,12 +5,14 @@ import openai
 import pandas_gpt
 import os
 from IPython.display import HTML
-# from tika import parser
-# from tika import parser
+from tika import parser
+import tika 
+tika.initVM()
+from tika import parser
 from werkzeug.utils import secure_filename
 # import PyPDF2
 from datetime import datetime
-import textract
+# import textract
 
 openai_key = st.sidebar.text_input("Enter your [OpenAI](https://openai.com/index/openai-api/) API key to prompt (optional):")
 
@@ -89,10 +91,10 @@ class Resume:
 #             os.makedirs(UPLOAD_FOLDER)
             
     def extract_pdf_data(self, filename):
-        # parsed_pdf = parser.from_file(filename)
-        # return parsed_pdf['content'], parsed_pdf['metadata']
-        text = textract.process(filename)
-        return text
+        parsed_pdf = parser.from_file(filename)
+        return parsed_pdf['content'], parsed_pdf['metadata']
+        # text = textract.process(filename)
+        # return text
 
     def generateResumeSummarizationPrompt(self, text):
         return f"Please summarize the following resume:\n\n{text}"
@@ -153,8 +155,8 @@ class Resume:
 
             if os.path.exists(filepath):
                 # Parse resume PDF and create background summary
-                # text, _ = self.extract_pdf_data(filepath)
-                text = self.extract_pdf_data(filepath)
+                text, _ = self.extract_pdf_data(filepath)
+                # text = self.extract_pdf_data(filepath)
                 text = text.strip()
 
                 prompt = self.generateResumeSummarizationPrompt(text)

@@ -5,4 +5,3 @@ python-jobspy
 werkzeug
 pandas_gpt
 ipython
-textract == 1.6.4
