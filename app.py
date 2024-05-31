@@ -14,7 +14,11 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 # import textract
 
-openai_key = st.sidebar.text_input("Enter your [OpenAI](https://openai.com/index/openai-api/) API key to prompt (optional):")
+st.set_page_config(
+        page_title="job search",
+)
+
+openai_key = st.sidebar.text_input("Enter your [OpenAI](https://openai.com/index/openai-api/) API key to start:")
 
 
 def get_pos(prompt, api):
@@ -259,6 +263,8 @@ def action_print(df, comp):
 def home():
     st.title('Job search 2024 🚀')
     st.markdown("""---""")
+    placeholder = st.empty()
+    placeholder.image('./sidebar_img.png')
     timestamp = datetime.now().strftime("%Y/%m/%d")
     
     # openai_api = st.sidebar.text_input("Enter your [OpenAI](https://openai.com/index/openai-api/) API key to prompt (optional):")
@@ -286,10 +292,12 @@ def home():
         type_app = 'cover-letter'
         
         if search_button:
+            placeholder.empty()
             st.header('Scraper 🧹')
             jobs, jobs_copy = scrape(prompt)
             st.session_state.jobs = jobs
             st.session_state.jobs_copy = jobs_copy
+            jobs_copy = jobs_copy.sort_values(by=['company'])
             st.write(jobs_copy.to_html(escape=False), unsafe_allow_html=True)
             
             
@@ -389,20 +397,20 @@ def home():
             
 
 
-def main():
+# def main():
     
-    PAGES = {
-        "Home": home
+#     PAGES = {
+#         "Home": home
         
-    }
+#     }
 
-    st.sidebar.title('Navigation')
-    selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+#     st.sidebar.title('Navigation')
+#     selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
-    page = PAGES[selection]
-    page()
+#     page = PAGES[selection]
+#     page()
 
 if __name__ == "__main__":
     
-    main()
+    home()
 
